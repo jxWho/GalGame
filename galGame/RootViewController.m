@@ -143,6 +143,10 @@
     // e.g. self.myOutlet = nil;
 }
 
+- (void)viewDidLoad
+{
+    NSLog(@"loadlll");
+}
 
 - (void)dealloc {
     [super dealloc];
