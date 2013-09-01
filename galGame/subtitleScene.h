@@ -11,7 +11,7 @@
 
 @interface subtitleScene : CCLayer {
     NSInteger currentIndex;
-
+    CCSprite *panelBG;
     
     CCLabelTTF *label;
     NSInteger count;
@@ -21,6 +21,13 @@
     BOOL showTimeFlag;
     
     BOOL isAutoFlag;
+    
+    CCSprite *iconSprite;
+    CCLabelTTF *iconName;
+    
+    NSInteger currentIconNumber;
+    
+    CCArray *iconArray;
 }
 
 @property(nonatomic, retain) CCSprite *bg;

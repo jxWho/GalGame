@@ -18,10 +18,13 @@
     NSInteger currentCont;
 }
 
+
 @property(nonatomic, retain, getter = getSayArray) NSMutableArray *sayArray;
+@property(nonatomic, retain, getter = getCharacterArray) NSMutableArray *characterArray;
 
 
 + (userManager *) sharedUserManager;
++ (void)destoryUserManager;
 
 - (void)setCurrentCont:(NSInteger)cnt;
 

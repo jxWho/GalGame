@@ -18,12 +18,16 @@
     
     NSInteger currentIndex;
     
+    @public
     gameBackGroundScene *gScene;
     subtitleScene *sScene;
 }
 
 @property(nonatomic, assign) CCLabelTTF *label;
 
+
+
 + (id)scene;
++ (id)shareGameSceneInstance;
 
 @end

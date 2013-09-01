@@ -10,8 +10,17 @@
 #import "userManager.h"
 #import "TimeScene.h"
 
+static GameScene *gameSceneInstance = nil;
+
 @implementation GameScene
 @synthesize label = _label;
+
++ (id)shareGameSceneInstance
+{
+    if( gameSceneInstance )
+        return gameSceneInstance;
+    return nil;
+}
 
 + (id)scene
 {
@@ -28,6 +37,7 @@
 //    CGSize size = [[CCDirector sharedDirector]winSize];
     
     if( self = [super init] ){
+        gameSceneInstance = self;
         
         gScene = nil;
         sScene = nil;

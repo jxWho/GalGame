@@ -11,6 +11,8 @@
 
 @interface gameBackGroundScene : CCLayer {
     NSInteger currentIndex;
+    
+    NSString *bgMusicName;
 }
 
 @property(assign) CCSprite *bg;

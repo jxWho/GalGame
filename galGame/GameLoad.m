@@ -18,7 +18,7 @@
 
 - (id)initWithTargetScene
 {
-    CGSize size = [[CCDirector sharedDirector]winSize];
+//    CGSize size = [[CCDirector sharedDirector]winSize];
     
     self = [super init];
     if( self ){

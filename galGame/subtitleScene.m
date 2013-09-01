@@ -11,6 +11,8 @@
 #import "userManager.h"
 #import <string.h>
 
+const NSInteger panlBGTag = 100;
+
 
 @implementation subtitleScene
 
@@ -25,26 +27,60 @@
 
 - (id)init
 {
-    CGSize size = [[CCDirector sharedDirector]winSize];
     
     if( self = [super init] ){
         count = 0;
+        panelBG = nil;
+        timeSprite = nil;
+        showTime = 0;
+        isAutoFlag = NO;
         
-        CCSprite *sprite = [CCSprite spriteWithFile:@"panel_bg.png"];
-        sprite.rotation = 90;
-        sprite.position = CGPointMake(260 / 2, size.height / 2);
-        sprite.opacity = 225 * 0.8;
-        [self addChild:sprite];
+        [self registerWithTouchDispatcher];
+        [self schedule:@selector(updateString:) interval:0.2f];
         
+        iconSprite = nil;
+        iconName = nil;
+        currentIconNumber = -11;
+        
+        iconArray = [[CCArray array] retain];
+        for( int i = 0; i < 16; i++ ){
+            CGSize size = [[CCDirector sharedDirector]winSize];
+            NSString *iconPath = [[NSBundle mainBundle]pathForResource:[NSString stringWithFormat:@"icon%d", i] ofType:@"png"];
+            if( [[NSFileManager defaultManager]fileExistsAtPath:iconPath] ){
+                CCSprite *tempSprite = [CCSprite spriteWithFile:[NSString stringWithFormat:@"icon%d.png", i]];
+                tempSprite.position = ccp(260 - 100,  size.height - 50);
+                tempSprite.rotation = 90;
+                [iconArray addObject:tempSprite];
+            }else{
+                [iconArray addObject:0];
+            }
+        }
+        NSLog(@"%d", [iconArray count]);
+    }
+    return self;
+}
 
-        label = [CCLabelTTF labelWithString:@"" dimensions:CGSizeMake(1000, 200) alignment:UITextAlignmentLeft  fontName:@"AppleGothic" fontSize:25 ];
-//        label = [CCLabelTTF labelWithString:@"test" fontName:@"AppleGothic" fontSize:25];
+
+
+- (void)updateString:(ccTime)delta
+{
+
+    if( !panelBG ){
+        count = 0;
+        CGSize size = [[CCDirector sharedDirector]winSize];
+        panelBG = [CCSprite spriteWithFile:@"panel_bg.png"];
+        panelBG.rotation = 90;
+        panelBG.position = CGPointMake(260 / 2, size.height / 2);
+        panelBG.opacity = 225 * 0.8;
+        [self addChild:panelBG];
+        
+        label = [CCLabelTTF labelWithString:@"" dimensions:CGSizeMake(800, 190) alignment:UITextAlignmentLeft  fontName:@"AppleGothic" fontSize:25 ];
         label.color = ccBLACK;
-
+        
         label.anchorPoint = CGPointMake(0, 0);
-//        label.position = ccp(0, 200);
-
-        [sprite addChild:label];
+        label.position = ccp(200, 0);
+        
+        [panelBG addChild:label];
         
         CCSprite *autoItemNormal = [CCSprite spriteWithFile:@"panel_auto.png"];
         CCSprite *autoItemSelected = [CCSprite spriteWithFile:@"panel_auto.png"];
@@ -56,14 +92,29 @@
                 [self schedule:@selector(updateString:) interval:0.2f];
             }else{
                 isAutoFlag = YES;
-                [self schedule:@selector(updateString:) interval:0.1f];
+                [self schedule:@selector(updateString:) interval:0.05f];
             }
         }];
         
         CCSprite *skipItemNormal = [CCSprite spriteWithFile:@"panel_skip.png"];
         CCSprite *skipItemSelected = [CCSprite spriteWithFile:@"panel_skip.png"];
         skipItemSelected.color = ccGRAY;
-        CCMenuItemSprite *item2 = [CCMenuItemSprite itemFromNormalSprite:skipItemNormal selectedSprite:skipItemSelected];
+        CCMenuItemSprite *item2 = [CCMenuItemSprite itemFromNormalSprite:skipItemNormal selectedSprite:skipItemSelected block:^(id sender){
+            [self unscheduleAllSelectors];
+            userManager *UM = [userManager sharedUserManager];
+            
+            while (YES) {
+                int index = UM -> currentCont;
+                NSDictionary *tempD = [UM.getSayArray objectAtIndex:index];
+                NSString *word = [tempD objectForKey:@"word"];
+                if( [word rangeOfString:@"@Question"].length > 0 ){
+                    [self schedule:@selector(updateString:) interval:0.1f];
+                    [label setString:@""];
+                    break;
+                }
+                UM -> currentCont = UM -> currentCont + 1;
+            }
+        }];
         
         
         CCMenu *menu1 = [CCMenu menuWithItems:item1, item2, nil];
@@ -72,7 +123,7 @@
         
         CGPoint p = menu1.position;
         NSLog(@"menu point is %f %f",p.x, p.y);
-        [sprite addChild:menu1];
+        [panelBG addChild:menu1];
         
         CCSprite *saveItemNormal = [CCSprite spriteWithFile:@"panel_save.png"];
         CCSprite *saveItemSelected = [CCSprite spriteWithFile:@"panel_save.png"];
@@ -87,7 +138,7 @@
         [menu2 alignItemsHorizontallyWithPadding:0];
         menu2.position = ccp(780, 223);
         
-        [sprite addChild:menu2];
+        [panelBG addChild:menu2];
         
         CCSprite *systemItmenNormal = [CCSprite spriteWithFile:@"panel_system.png"];
         CCSprite *systemItemSelected = [CCSprite spriteWithFile:@"panel_system.png"];
@@ -95,90 +146,206 @@
         CCMenuItemSprite *systemItem = [CCMenuItemSprite itemFromNormalSprite:systemItmenNormal selectedSprite:systemItemSelected target:self selector:@selector(changeToSystem:)];
         CCMenu *menu3 = [CCMenu menuWithItems:systemItem, nil];
         menu3.position = ccp(930, 223);
-        [sprite addChild:menu3];
-        
-        [self schedule:@selector(updateString:) interval:0.2f];
-        
-        
-        timeSprite = nil;
-        showTime = 0;
-        
-        [self registerWithTouchDispatcher];
-        
-        isAutoFlag = NO;
-        
+        [panelBG addChild:menu3];
     }
-    return self;
-}
-
-- (void)updateString:(ccTime)delta
-{
+    
     CGSize size = [[CCDirector sharedDirector]winSize];
     
     userManager *UM = [userManager sharedUserManager];
     int index = UM -> currentCont;
     NSDictionary *tempD = [UM.getSayArray objectAtIndex:index];
     NSString *word = [tempD objectForKey:@"word"];
-    const char *p = [word UTF8String];
-    int length = strlen(p);
-   
-        if( count < length ){
-            if( (int)p[count] > 127 || (int)p[count] < 0 )
-                count += 3;
-            else
-                count ++;
-        }else{
-            if( isAutoFlag == YES ){
-                UM -> currentCont ++;
-                count = 0;
+    
+    if( [word rangeOfString:@"@Question"].length > 0 ){
+        //remove icon and name
+        [iconName setString:@""];
+        [iconSprite removeFromParentAndCleanup:NO];
+        iconSprite = nil;
+        currentIconNumber = -1;
+        //choose Item
+        NSArray *array = [word componentsSeparatedByString:@"#"];
+        int num = [[array objectAtIndex:2] intValue];
+
+        CCMenu *menu = [CCMenu menuWithItems: nil];
+        CCSprite *optionBg = [CCSprite spriteWithFile:@"option_bg.png"];
+
+        for( int i = 0; i < num; i++){
+            CCMenuItemFont *menuItem = [CCMenuItemFont itemFromString:[array objectAtIndex:3 + i] block:^(id sender){
+                [optionBg removeFromParentAndCleanup:YES];
+                int nextSay = [[array objectAtIndex:3 + num + i] intValue];
+                UM -> currentCont = nextSay;
+                [self schedule:@selector(updateString:) interval:0.1f];
+            }];
+            menuItem.color = ccBLACK;
+
+            [menu addChild:menuItem ];
+        }
+
+        menu.position = ccp(525, 190);
+        
+        [menu alignItemsVerticallyWithPadding:0];
+        
+        optionBg.rotation = 90;
+        optionBg.position = ccp(size.width / 2, size.height / 2);
+        
+        [optionBg addChild:menu];
+        [self addChild:optionBg];
+        [self unscheduleAllSelectors];
+        
+
+        [panelBG removeFromParentAndCleanup:YES];
+        panelBG = nil;
+//        [iconSprite removeFromParentAndCleanup:YES];
+//        if( iconSprite )
+//            [iconSprite removeFromParentAndCleanup:YES];
+
+    }else{
+        //icon
+        NSInteger iconNumber = [[tempD objectForKey:@"person"] intValue];
+        if( iconNumber != currentIconNumber ){
+            NSLog(@"%d", [iconArray count]);
+
+           
+            if( currentIconNumber >= 0 ){
+                if( iconSprite ){
+                    CCSprite *cTemp = [iconArray objectAtIndex:currentIconNumber];
+                    [cTemp removeFromParentAndCleanup:NO];
+                }
             }
             
+            currentIconNumber = iconNumber;
+            
+            NSString *iconPath = [[NSBundle mainBundle]pathForResource:[NSString stringWithFormat:@"icon%d", iconNumber] ofType:@"png"];
+            
+            if( [[NSFileManager defaultManager]fileExistsAtPath:iconPath] ){
+                CCSprite *cTemp;
+                cTemp = [iconArray objectAtIndex:iconNumber];
+                [self addChild:cTemp];
+                iconSprite = cTemp;
+                
+
+            }else{
+            }
+        
+        //icon Name
+        NSArray *characterArray = [UM getCharacterArray];
+        for( NSDictionary *p in characterArray ){
+            NSInteger iconID = [[p objectForKey:@"id"] intValue];
+            if( iconID == iconNumber ){
+                NSString *name = [p objectForKey:@"name"];
+                if( iconName ){
+                    [iconName setString:name];
+                }else{
+                    iconName = [CCLabelTTF labelWithString:name fontName:@"AppleGothic" fontSize:28];
+                    iconName.position = ccp(260 - 40,  size.height - 50);
+                    
+                    iconName.rotation = 90;
+                    ccColor3B pink = {255, 105, 180};
+                    iconName.color = pink;
+                    [self addChild:iconName z:10];
+                }
+                break;
+            }
         }
+    }
     
-    char *k = (char *)malloc(count + 1);
-    
-    memcpy(k, p, count);
-    k[count] = '\0';
-    [label setString:[NSString stringWithUTF8String:k]];
+        //word
+        const char *p = [word UTF8String];
+        int length = strlen(p);
+       
+            if( count < length ){
+                if( (int)p[count] > 127 || (int)p[count] < 0 )
+                    count += 3;
+                else
+                    count ++;
+            }else{
+                if( isAutoFlag == YES ){
+                    int nextNum = [[tempD objectForKey:@"next"] intValue];
+                    if( nextNum <= 0 ){
+                        UM -> currentCont ++;
+                    }else{
+                        [UM setCurrentCont:nextNum];
+                    }
+                    count = 0;
+                }
+                
+            }
+        
+        char *k = (char *)malloc(count + 1);
+        
+        memcpy(k, p, count);
+        k[count] = '\0';
+        [label setString:[NSString stringWithUTF8String:k]];
+        free(k);
+
+    }
 
 }
+
 
 - (void)changeToSystem:(id)what
 {
 //    [[CCDirector sharedDirector]pushScene:[settingScene scene]];
     settingScene *scene = [settingScene node];
-    [self addChild:scene];
+    [self addChild:scene z:1 tag:panlBGTag];
 }
 
 - (void) registerWithTouchDispatcher
 {
-    [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:-1 swallowsTouches:YES];
+    [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:1 swallowsTouches:YES];
 }
 
-- (BOOL)isTouchForMe
+- (BOOL)isTouchForMe:(CGPoint) touchLocation
 {
+//    CCNode *node = [self getChildByTag:panlBGTag];
+//    if( node ){
+//        NSLog(@"see");
+//        CGRect rect = [node boundingBox];
+//        NSLog(@"%f %f %f %f", rect.origin.x, rect.origin.y, rect.size.height, rect.size.width);
+//        NSLog(@"%f %f", touchLocation.x, touchLocation.y);
+//        if( CGRectContainsPoint([node boundingBox], touchLocation) ){
+//            return NO;
+//        }else{
+//            NSLog(@"not in");
+//        }
+//    }
     return YES;
 }
 
+- (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    CGPoint point = [self convertTouchToNodeSpace:touch];
+    NSLog(@"%f %f", point.x, point.y);
+    UIAlertView *alert = [[[UIAlertView alloc]initWithTitle:@"test" message:@"alert" delegate:self cancelButtonTitle:@"cancel" otherButtonTitles: nil]autorelease];
+    [alert show];
+}
+
+
 - (BOOL) ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    BOOL isTouchHandled = [self isTouchForMe];
-    
-    userManager *UM = [userManager sharedUserManager];
-    int index = UM -> currentCont;
-    NSDictionary *tempD = [UM.getSayArray objectAtIndex:index];
-    NSString *word = [tempD objectForKey:@"word"];
-    const char *p = [word UTF8String];
-    int length = strlen(p);
-    
-    if( count >= length ){
-        UM -> currentCont ++;
-        count = 0;
-    }else{
-        count = length;
+    NSLog(@"second");
+    CGPoint location = [self convertTouchToNodeSpace:touch];
+    BOOL isTouchHandled = [self isTouchForMe:location];
+    if( isTouchHandled ){
+        userManager *UM = [userManager sharedUserManager];
+        int index = UM -> currentCont;
+        NSDictionary *tempD = [UM.getSayArray objectAtIndex:index];
+        NSString *word = [tempD objectForKey:@"word"];
+        const char *p = [word UTF8String];
+        int length = strlen(p);
+        
+        if( count >= length ){
+            int nextNum = [[tempD objectForKey:@"next"] intValue];
+            if( nextNum <= 0 ){
+                UM -> currentCont ++;
+            }else{
+                [UM setCurrentCont:nextNum];
+            }
+            count = 0;
+        }else{
+            count = length;
+        }
     }
-
-    
     return isTouchHandled;
 }
 
@@ -186,6 +353,12 @@
 {
 //    NSLog(@"touch2~~");
 
+}
+
+- (void)dealloc
+{
+    [super dealloc];
+    [iconArray release];
 }
 
 @end

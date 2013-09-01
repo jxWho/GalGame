@@ -16,7 +16,7 @@
 
 - (id)init
 {
-    CGSize size = [[CCDirector sharedDirector]winSize];
+//    CGSize size = [[CCDirector sharedDirector]winSize];
     
     if( self = [super init] ){
 //        self.bg = [CCSprite spriteWithFile:@"0.png"];
@@ -25,7 +25,7 @@
 //        [self addChild:self.bg ];
         
         currentIndex = 0;
-        
+        bgMusicName = nil;
 //        [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"0.mp3" loop:YES];
 //        [[SimpleAudioEngine sharedEngine] playEffect:@"sound_打字.mp3"];
         [self scheduleUpdate];
@@ -51,7 +51,11 @@
             [self addChild:self.bg ];
         }
         
-        [[SimpleAudioEngine sharedEngine] playBackgroundMusic:[NSString stringWithFormat:@"%@.mp3", [dd objectForKey:@"music"]] loop:YES];
+        if( [dd objectForKey:@"music"] &&
+           ![[dd objectForKey:@"music"] isEqualToString:bgMusicName] ){
+            [[SimpleAudioEngine sharedEngine] playBackgroundMusic:[NSString stringWithFormat:@"%@.mp3", [dd objectForKey:@"music"]] loop:YES];
+            bgMusicName = [dd objectForKey:@"music"];
+        }
         
         
         if( [dd objectForKey:@"effect"] && ![[dd objectForKey:@"effect"] isEqualToString:@""] ){
@@ -61,10 +65,13 @@
             }else{
                 if( self.bg )
                     [self.bg removeFromParentAndCleanup:YES];
-                self.bg = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@.png",[dd objectForKey:@"effect"]]];
-                self.bg.position = CGPointMake(size.width / 2, size.height / 2);
-                self.bg.rotation = 90;
-                [self addChild:self.bg ];
+                NSString *effectPath = [[NSBundle mainBundle]pathForResource:[dd objectForKey:@"effect"] ofType:@"png"];
+                if( [[NSFileManager defaultManager] fileExistsAtPath:effectPath] ){
+                    self.bg = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@.png",[dd objectForKey:@"effect"]]];
+                    self.bg.position = CGPointMake(size.width / 2, size.height / 2);
+                    self.bg.rotation = 90;
+                    [self addChild:self.bg ];
+                }
             }
         }
         

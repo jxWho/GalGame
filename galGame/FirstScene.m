@@ -69,7 +69,6 @@
 
         menu.rotation = 90;
         
-        userManager *u = [userManager sharedUserManager];
         
     }
     return self;
@@ -78,6 +77,8 @@
 - (void)NewGameTouch:(id)sender
 {
     NSLog(@"touch");
+    
+    [userManager destoryUserManager];
     CCTransitionFade *tran = [CCTransitionFade transitionWithDuration:1 scene:[GameLoad scene] withColor:ccBLACK];
     [[CCDirector sharedDirector]replaceScene:tran];
 }
