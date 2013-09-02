@@ -1,4 +1,6 @@
 GalGame
 =======
 
-Game 
+A galGame 
+Using cocos2d-iphone
+Running on ipad
