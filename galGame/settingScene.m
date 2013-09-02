@@ -12,6 +12,12 @@
 #import "userManager.h"
 #import "GameScene.h"
 
+NSUInteger strackLength;
+const NSUInteger button1 = 1;
+const NSUInteger button2 = 2;
+const NSUInteger button3 = 3;
+const NSUInteger button4 = 4;
+
 
 @implementation settingScene
 
@@ -28,6 +34,8 @@
 
 -(id) init
 {
+    currentTouch = 0;
+    
     CGSize size = [[CCDirector sharedDirector]winSize];
     
     self = [super initWithColor:ccc4(255, 255, 255, 20)];
@@ -70,13 +78,36 @@
         CCSprite *strack1 = [CCSprite spriteWithFile:@"system_strack.png"];
         strack1.position = CGPointMake(300, 560);
         [sprite addChild:strack1];
+        strackLength = strack1.texture.contentSize.width;
 
         CCSprite *sButton1 = [CCSprite spriteWithFile:@"system_sbutton.png"];
         sButton1.position = CGPointMake(150, 560);
 //        sButton1.anchorPoint = CGPointMake(0, 0);
-        [sprite addChild:sButton1];
-
+        [sprite addChild:sButton1 z:0 tag:button1];
         
+        CCSprite *strack2 = [CCSprite spriteWithFile:@"system_strack.png"];
+        strack2.position = ccp(300, 480);
+        [sprite addChild:strack2];
+        
+        CCSprite *sButton2 = [CCSprite spriteWithFile:@"system_sbutton.png"];
+        sButton2.position = ccp(150, 480);
+        [sprite addChild:sButton2 z:0 tag:button2];
+        
+        CCSprite *strack3 = [CCSprite spriteWithFile:@"system_strack.png"];
+        strack3.position = ccp(300, 360);
+        [sprite addChild:strack3];
+        
+        CCSprite *sButton3 = [CCSprite spriteWithFile:@"system_sbutton.png"];
+        sButton3.position = ccp(150, 360);
+        [sprite addChild:sButton3 z:0 tag:button3];
+        
+        CCSprite *strack4 = [CCSprite spriteWithFile:@"system_strack.png"];
+        strack4.position = ccp(300, 290);
+        [sprite addChild:strack4 ];
+
+        CCSprite *sButton4 = [CCSprite spriteWithFile:@"system_sbutton.png"];
+        sButton4.position = ccp(150, 290);
+        [sprite addChild:sButton4 z:0 tag:button4];
         
     }
     return self;
@@ -100,7 +131,10 @@
     CGPoint location = [bg convertTouchToNodeSpace:touch];
     BOOL isHandlered = [self isTouchForMe:location];
     if( isHandlered ){
-        
+        CCNode *node = [bg getChildByTag:button1];
+        if( CGRectContainsPoint(node.boundingBox, location) ){
+            currentTouch = button1;
+        }
     }
     return isHandlered;
 }
@@ -108,8 +142,18 @@
 - (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
     CCNode *bg = [self getChildByTag:100];
-    CGPoint location = [bg convertTouchToNodeSpace:bg];
+    CGPoint location = [bg convertTouchToNodeSpace:touch];
     
+    if( currentTouch == button1 ){
+        CCNode *bt = [bg getChildByTag:button1];
+        if( location.x > strackLength + 150 ){
+            bt.position = ccp(strackLength + 150, bt.position.y);
+        }else if( location.x < 150 ){
+            bt.position = ccp(150, bt.position.y);
+        }else{
+            bt.position = ccp(location.x, bt.position.y);
+        }
+    }
 }
 
 @end

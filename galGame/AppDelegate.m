@@ -15,6 +15,11 @@
 #import "FirstScene.h"
 #import "GameScene.h"
 
+void uncaughtExceptionHandler(NSException *expection){
+    NSLog(@"CRASH: %@", expection);
+    NSLog(@"Stack Trace: %@", [expection callStackSymbols]);
+}
+
 @implementation AppDelegate
 
 @synthesize window;
@@ -42,6 +47,7 @@
 }
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
 	// Init the window
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
@@ -158,4 +164,7 @@
 	[super dealloc];
 }
 
+
 @end
+
+
