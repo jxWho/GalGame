@@ -16,6 +16,7 @@
     BOOL sayOpen;
     @public
     NSInteger currentCont;
+    float musicVolume;
 }
 
 

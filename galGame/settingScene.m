@@ -93,21 +93,8 @@ const NSUInteger button4 = 4;
         sButton2.position = ccp(150, 480);
         [sprite addChild:sButton2 z:0 tag:button2];
         
-        CCSprite *strack3 = [CCSprite spriteWithFile:@"system_strack.png"];
-        strack3.position = ccp(300, 360);
-        [sprite addChild:strack3];
-        
-        CCSprite *sButton3 = [CCSprite spriteWithFile:@"system_sbutton.png"];
-        sButton3.position = ccp(150, 360);
-        [sprite addChild:sButton3 z:0 tag:button3];
-        
-        CCSprite *strack4 = [CCSprite spriteWithFile:@"system_strack.png"];
-        strack4.position = ccp(300, 290);
-        [sprite addChild:strack4 ];
-
-        CCSprite *sButton4 = [CCSprite spriteWithFile:@"system_sbutton.png"];
-        sButton4.position = ccp(150, 290);
-        [sprite addChild:sButton4 z:0 tag:button4];
+        userManager *shareManger = [userManager sharedUserManager];
+        sButton1.position = ccp(strackLength * shareManger -> musicVolume + 150, 560);
         
     }
     return self;
@@ -134,8 +121,27 @@ const NSUInteger button4 = 4;
         CCNode *node = [bg getChildByTag:button1];
         if( CGRectContainsPoint(node.boundingBox, location) ){
             currentTouch = button1;
+            goto returnlabel;
         }
+        node = [bg getChildByTag:button2];
+        if( CGRectContainsPoint(node.boundingBox, location) ){
+            currentTouch = button2;
+            goto returnlabel;
+        }
+        node = [bg getChildByTag:button3];
+        if( CGRectContainsPoint(node.boundingBox, location) ){
+            currentTouch = button3;
+            goto returnlabel;
+        }
+        node = [bg getChildByTag:button4];
+        if( CGRectContainsPoint(node.boundingBox, location) ){
+            currentTouch = button4;
+            goto returnlabel;
+        }
+        currentTouch = -1;
     }
+
+    returnlabel:
     return isHandlered;
 }
 
@@ -144,8 +150,8 @@ const NSUInteger button4 = 4;
     CCNode *bg = [self getChildByTag:100];
     CGPoint location = [bg convertTouchToNodeSpace:touch];
     
-    if( currentTouch == button1 ){
-        CCNode *bt = [bg getChildByTag:button1];
+    if( currentTouch >= 1 ){
+        CCNode *bt = [bg getChildByTag:currentTouch];
         if( location.x > strackLength + 150 ){
             bt.position = ccp(strackLength + 150, bt.position.y);
         }else if( location.x < 150 ){
@@ -154,6 +160,30 @@ const NSUInteger button4 = 4;
             bt.position = ccp(location.x, bt.position.y);
         }
     }
+}
+
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    CCNode *bg = [self getChildByTag:100];
+    CGPoint location = [bg convertTouchToNodeSpace:touch];
+    float newX;
+    if ( location.x < 150 )
+        newX = 0.;
+    else if (location.x > strackLength + 150 ){
+        newX = strackLength;
+    }else{
+        newX = location.x - 150.;
+    }
+        
+    if( currentTouch > 0 ){
+        if( currentTouch == 1 ){
+            float rate = newX / strackLength ;
+            NSLog(@"%f %f %d", rate, newX, strackLength);
+            [[SimpleAudioEngine sharedEngine] setBackgroundMusicVolume:rate];
+            [userManager sharedUserManager]->musicVolume = rate;
+        }
+    }
+    currentTouch = -1;
 }
 
 @end

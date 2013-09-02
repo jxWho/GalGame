@@ -54,6 +54,7 @@
         if( [dd objectForKey:@"music"] &&
            ![[dd objectForKey:@"music"] isEqualToString:bgMusicName] ){
             [[SimpleAudioEngine sharedEngine] playBackgroundMusic:[NSString stringWithFormat:@"%@.mp3", [dd objectForKey:@"music"]] loop:YES];
+            [[SimpleAudioEngine sharedEngine]setBackgroundMusicVolume:[userManager sharedUserManager]->musicVolume];
             bgMusicName = [dd objectForKey:@"music"];
         }
         

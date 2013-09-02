@@ -33,6 +33,7 @@ static userManager *sharedUser = nil;
 {
     if( self = [super init] ){
         currentCont = 1;
+        musicVolume = 0.5;
         
         sayOpen = YES;
         sayContent = [[NSMutableDictionary alloc]init];

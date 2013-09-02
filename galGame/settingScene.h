@@ -10,7 +10,7 @@
 #import "cocos2d.h"
 
 @interface settingScene : CCLayerColor<CCTargetedTouchDelegate> {
-    NSUInteger currentTouch;
+    NSInteger currentTouch;
 }
 
 + (id)scene;
