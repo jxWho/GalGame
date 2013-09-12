@@ -7,7 +7,7 @@
 //
 
 #import "TimeScene.h"
-
+#import "userManager.h"
 
 @implementation TimeScene
 
@@ -15,7 +15,7 @@
 {
     CCScene *scene = [CCScene node];
     CCLayer *layer = [TimeScene node];
-    [scene addChild:layer];
+    [scene addChild:layer z:0 tag:1000];
     
     return scene;
 }
@@ -32,6 +32,16 @@
         timeShowSprite.rotation = 90;
         [self addChild:timeShowSprite];
         
+        userManager *UM = [userManager sharedUserManager];
+        NSDictionary *tempD = [[UM getSayArray]objectAtIndex:UM->currentCont];
+        
+        CCLabelTTF *label = [CCLabelTTF labelWithString:[tempD objectForKey:@"shijian"] fontName:@"STHeitiK-Light" fontSize:70];
+        CGSize size = [[CCDirector sharedDirector]winSize];
+        label.color = ccBLACK;
+        label.rotation = 90;
+        label.position = ccp(size.width / 2 , size.height / 2);
+        [self addChild:label];
+        
         [self scheduleUpdate];
     }
     return self;
@@ -44,4 +54,11 @@
        [[CCDirector sharedDirector]popScene];
 }
 
+
+- (void)setTimeString:(NSString *)newString
+{
+    [newString retain];
+    [timeString release];
+    timeString = newString;
+}
 @end

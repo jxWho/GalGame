@@ -15,6 +15,7 @@ const NSInteger panlBGTag = 100;
 
 
 @implementation subtitleScene
+@synthesize bg = _bg;
 
 + (id)scene
 {
@@ -29,6 +30,9 @@ const NSInteger panlBGTag = 100;
 {
     
     if( self = [super init] ){
+        shellDictionary = [[NSMutableDictionary alloc]init];
+        shellSprite = nil;
+        currentShell = @"A";
         count = 0;
         panelBG = nil;
         timeSprite = nil;
@@ -74,7 +78,7 @@ const NSInteger panlBGTag = 100;
         panelBG.opacity = 225 * 0.8;
         [self addChild:panelBG];
         
-        label = [CCLabelTTF labelWithString:@"" dimensions:CGSizeMake(800, 190) alignment:UITextAlignmentLeft  fontName:@"AppleGothic" fontSize:25 ];
+        label = [CCLabelTTF labelWithString:@"" dimensions:CGSizeMake(800, 190) alignment:UITextAlignmentLeft  fontName:@"STHeitiK-Light" fontSize:25 ];
         label.color = ccBLACK;
         
         label.anchorPoint = CGPointMake(0, 0);
@@ -155,6 +159,32 @@ const NSInteger panlBGTag = 100;
     int index = UM -> currentCont;
     NSDictionary *tempD = [UM.getSayArray objectAtIndex:index];
     NSString *word = [tempD objectForKey:@"word"];
+    NSString *newShell = [tempD objectForKey:@"shell"];
+    
+    if( ![newShell isEqualToString:currentShell] ){
+        currentShell = newShell;
+        if( [newShell isEqualToString:@"A"] ){
+            if( shellSprite != nil )
+                [shellSprite removeFromParentAndCleanup:NO];
+            
+        }else{
+                if( shellSprite != nil )
+                    [shellSprite removeFromParentAndCleanup:NO];
+            CCSprite *tempSp = [shellDictionary objectForKey:newShell];
+            if( tempSp != nil ){
+                shellSprite = tempSp;
+                shellSprite.position = ccp(size.width / 2, size.height / 2);
+                shellSprite.rotation = 90;
+                [self addChild:shellSprite z:-10];
+            }else{
+                shellSprite = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@.png", newShell]];
+                [shellDictionary setObject:shellSprite forKey:currentShell];
+                shellSprite.position = ccp(size.width / 2, size.height / 2);
+                shellSprite.rotation = 90;
+                [self addChild:shellSprite z:-10];
+            }
+        }
+    }
     
     if( [word rangeOfString:@"@Question"].length > 0 ){
         //remove icon and name
@@ -176,8 +206,8 @@ const NSInteger panlBGTag = 100;
                 UM -> currentCont = nextSay;
                 [self schedule:@selector(updateString:) interval:0.1f];
             }];
+            menuItem.fontName = @"STHeitiK-Light";
             menuItem.color = ccBLACK;
-
             [menu addChild:menuItem ];
         }
 
@@ -236,7 +266,7 @@ const NSInteger panlBGTag = 100;
                 if( iconName ){
                     [iconName setString:name];
                 }else{
-                    iconName = [CCLabelTTF labelWithString:name fontName:@"AppleGothic" fontSize:28];
+                    iconName = [CCLabelTTF labelWithString:name fontName:@"STHeitiK-Light" fontSize:28];
                     iconName.position = ccp(260 - 40,  size.height - 50);
                     
                     iconName.rotation = 90;
@@ -312,13 +342,7 @@ const NSInteger panlBGTag = 100;
     return YES;
 }
 
-- (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event
-{
-    CGPoint point = [self convertTouchToNodeSpace:touch];
-    NSLog(@"%f %f", point.x, point.y);
-    UIAlertView *alert = [[[UIAlertView alloc]initWithTitle:@"test" message:@"alert" delegate:self cancelButtonTitle:@"cancel" otherButtonTitles: nil]autorelease];
-    [alert show];
-}
+
 
 
 - (BOOL) ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event

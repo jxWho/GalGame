@@ -63,6 +63,7 @@
             NSString *effectString = [dd objectForKey:@"effect"];
             if( [effectString rangeOfString:@"sound"].length > 0 ){
                 [[SimpleAudioEngine sharedEngine] playEffect:[NSString stringWithFormat:@"%@.mp3", [dd objectForKey:@"effect"]]];
+                [[SimpleAudioEngine sharedEngine] setEffectsVolume:[userManager sharedUserManager]->effectVolume];
             }else{
                 if( self.bg )
                     [self.bg removeFromParentAndCleanup:YES];

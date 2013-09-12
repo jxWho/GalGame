@@ -45,7 +45,7 @@
         spirte3.rotation = 90;
         [self addChild:spirte3];
         
-        [CCMenuItemFont setFontName:@"Helvetica-BoldOblique"];
+        [CCMenuItemFont setFontName:@"STHeitiK-Medium"];
         [CCMenuItemFont setFontSize:50];
         CCMenuItemFont *item1 = [CCMenuItemFont itemFromString:@"New Game" target:self selector:@selector(NewGameTouch:)];
         item1.color = ccBLACK;

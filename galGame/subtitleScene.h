@@ -28,6 +28,10 @@
     NSInteger currentIconNumber;
     
     CCArray *iconArray;
+    
+    CCSprite *shellSprite;
+    NSString *currentShell;
+    NSMutableDictionary *shellDictionary;
 }
 
 @property(nonatomic, retain) CCSprite *bg;

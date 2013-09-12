@@ -12,9 +12,12 @@
 @interface TimeScene : CCLayer {
     CCSprite *timeShowSprite;
     NSInteger showTime;
+    
+    NSString *timeString;
 }
 
-+ (id)scene;
 
++ (id)scene;
+- (void)setTimeString:(NSString *)newString;
 
 @end

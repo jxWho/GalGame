@@ -34,6 +34,7 @@ static userManager *sharedUser = nil;
     if( self = [super init] ){
         currentCont = 1;
         musicVolume = 0.5;
+        effectVolume = 0.5;
         
         sayOpen = YES;
         sayContent = [[NSMutableDictionary alloc]init];
@@ -45,6 +46,7 @@ static userManager *sharedUser = nil;
         [parser setShouldReportNamespacePrefixes:NO];
         [parser setShouldResolveExternalEntities:NO];
         [parser parse];
+        [parser release];
         
         sayOpen = NO;
         NSString *characterUrl = [[NSBundle mainBundle] pathForResource:@"characters" ofType:@"xml"];
@@ -54,6 +56,7 @@ static userManager *sharedUser = nil;
         [parser2 setShouldReportNamespacePrefixes:NO];
         [parser2 setShouldResolveExternalEntities:NO];
         [parser2 parse];
+        [parser2 release];
         
 //        NSString *p = @"@Question##1#kkk";
 //        NSArray *array = [p componentsSeparatedByString:@"#"];
@@ -90,7 +93,7 @@ static userManager *sharedUser = nil;
 //    NSLog(@"<%@>", elementName);
 
     sayElementName = elementName;
-    bufferString = [[NSMutableString alloc]init];
+    bufferString = [[[NSMutableString alloc]init] autorelease];
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string

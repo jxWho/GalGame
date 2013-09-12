@@ -17,6 +17,7 @@
     @public
     NSInteger currentCont;
     float musicVolume;
+    float effectVolume;
 }
 
 

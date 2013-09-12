@@ -95,6 +95,7 @@ const NSUInteger button4 = 4;
         
         userManager *shareManger = [userManager sharedUserManager];
         sButton1.position = ccp(strackLength * shareManger -> musicVolume + 150, 560);
+        sButton2.position = ccp(strackLength * shareManger -> effectVolume + 150, 480);
         
     }
     return self;
@@ -181,6 +182,10 @@ const NSUInteger button4 = 4;
             NSLog(@"%f %f %d", rate, newX, strackLength);
             [[SimpleAudioEngine sharedEngine] setBackgroundMusicVolume:rate];
             [userManager sharedUserManager]->musicVolume = rate;
+        }else{
+            float rate = newX / strackLength;
+            [[SimpleAudioEngine sharedEngine]setEffectsVolume:rate];
+            [userManager sharedUserManager]->effectVolume = rate;
         }
     }
     currentTouch = -1;

@@ -65,6 +65,9 @@ static GameScene *gameSceneInstance = nil;
     if( [dd objectForKey:@"shijian"] && !showTimeFlag ){
         showTimeFlag = YES;
         //push the scene in
+        CCScene *scene = [TimeScene scene];
+        TimeScene *subScene = (TimeScene *)[scene getChildByTag:1000];
+        [subScene setTimeString:@"cao"];
         [[CCDirector sharedDirector]pushScene:[TimeScene scene]];
     }
     
