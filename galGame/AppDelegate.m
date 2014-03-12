@@ -43,7 +43,7 @@ void uncaughtExceptionHandler(NSException *expection){
 //	[[director openGLView] swapBuffers];
 //	CC_ENABLE_DEFAULT_GL_STATES();
 	
-#endif // GAME_AUTOROTATION == kGameAutorotationUIViewController	
+#endif // GAME_AUTOROTATION == kGameAutorotationUIViewController
 }
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
